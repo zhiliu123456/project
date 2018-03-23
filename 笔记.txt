@@ -1,0 +1,523 @@
+2017年10月24日11:11:36
+今天使用了SmartRefreshLayout控件，看着挺简单的，其实使用特别简单，但是了解起来比较麻烦。看来自己还需要更多的时间了解更多的新的知识
+
+ScrollView嵌套GridView时，需要重写GridView。如下代码：
+/** 
+ *自定义gridview，解决ScrollView中嵌套gridview显示不正常的问题（1行） 
+ */  
+public class MyGridView extends GridView{  
+      public MyGridView(Context context, AttributeSet attrs) {   
+            super(context, attrs);   
+        }   
+       
+        public MyGridView(Context context) {   
+            super(context);   
+        }   
+       
+        public MyGridView(Context context, AttributeSet attrs, int defStyle) {   
+            super(context, attrs, defStyle);   
+        }   
+       
+        @Override   
+        public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {   
+       
+            int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2,   
+                    MeasureSpec.AT_MOST);   
+            super.onMeasure(widthMeasureSpec, expandSpec);   
+        }   
+}  
+
+2017年10月25日11:21:58
+HorizontalScrollView源码分析：
+构造方法进入：最后走到构造方法：HorizontalScrollView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes)
+
+2017年11月6日09:38:18
+上周实现了Java读取Word的文档，上网查资料，有好几种实现方式。诶，自己能力不够，只能处理一些Word文字信息，像图片、公式、表格这些都没有做处理。想想自己都不争气啊。好了，不扯闲话了。处理Word的方法有POI读取、IText读取、office读取(这个是收费的，直接pass)。我选择的是POI读取方式。
+首先第一步：创建Java项目工程，作为测试，看看能不能实现功能。然后百度搜索POI官方网站，直接下载最新的POI相关jar包。下载网址：http://poi.apache.org/
+这个是POI的网址。
+这里读取Word文档，分为两种：一个是Word2003的，另一个是Word2007的。我这里处理的是word2003的：如下代码：
+	FileInputStream inputSream = new FileInputStream(filePath);
+        HWPFDocument hwp = new HWPFDocument(inputSream);
+
+        Range range = hwp.getRange();
+        List<Picture> pictures = hwp.getPicturesTable().getAllPictures();
+        System.out.println("pictures:"+pictures.size());
+        int numParagraphs = range.numParagraphs();//// 得到页面所有的段落数
+        System.out.println("numParagraphs:"+numParagraphs);
+
+//获取当前段落
+Paragraph paragraph = range.getParagraph(i);
+String text = paragraph.text();//获取段落文本内容。
+让后接下来处理文本内容。
+另一种Word2007的，我没有试过解析方法。
+
+2017年11月6日10:31:55
+Java读取pdf文件内容，可以将试卷上的序号标题能给读取出来。使用的是PDFBox方式读取。
+下载网址：https://pdfbox.apache.org/
+
+参考网址：http://blog.csdn.net/loongshawn/article/details/51542309
+
+代码实现：
+PDDocument document = PDDocument.load(file);
+        int numberOfPages = document.getNumberOfPages();//获取页码
+        PDFTextStripper stripper = new PDFTextStripper();
+        //设置按顺序输出
+        stripper.setSortByPosition(true);
+        stripper.setStartPage(1);
+        stripper.setEndPage(numberOfPages);
+        String content = stripper.getText(document);//获取文本
+
+注：以上jar包在使用过程中。还需要导入commons-collections4-4.1.jar，因为jar包中引用了这里面的类。collections4官方网址：http://commons.apache.org/proper/commons-collections/
+
+
+
+2017年11月6日10:32:03
+Java POI生成Excel文件。
+如下代码：
+// 声明一个工作薄
+        HSSFWorkbook wb = new HSSFWorkbook();
+        //声明一个单子并命名
+        HSSFSheet sheet = wb.createSheet("three");
+        //给单子名称一个长度
+        sheet.setDefaultColumnWidth((short)15);
+        // 生成一个样式
+        HSSFCellStyle style = wb.createCellStyle();
+        //创建第一行（也可以称为表头）
+        HSSFRow row = sheet.createRow(0);
+        //样式字体居中
+        //style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        //给表头第一行一次创建单元格
+        HSSFCell cell = row.createCell((short) 0);
+        cell.setCellValue("学生编号");
+        cell.setCellStyle(style);
+        cell = row.createCell( (short) 1);
+        cell.setCellValue("学生姓名");
+        cell.setCellStyle(style);
+        cell = row.createCell((short) 2);
+        cell.setCellValue("学生性别");
+        cell.setCellStyle(style);
+
+        //添加一些数据，这里先写死，大家可以换成自己的集合数据
+        List<Student>list = new ArrayList();
+        list.add(new Student(1,"张三","男"));
+        list.add(new Student(111,"李四","男"));
+        list.add(new Student(111,"王五","女"));
+
+        //向单元格里填充数据
+        for (short i = 0; i < list.size(); i++) {
+            row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue(list.get(i).getId());
+            row.createCell(1).setCellValue(list.get(i).getName());
+            row.createCell(2).setCellValue(list.get(i).getSex());
+        }
+
+        try {
+            //默认导出到E盘下
+            FileOutputStream out = new FileOutputStream("E://"+("学生表")+".xls");
+            wb.write(out);
+
+            out.close();
+            //JOptionPane.showMessageDialog(null, 导出成功!);
+        } catch (FileNotFoundException e) {
+            //JOptionPane.showMessageDialog(null, 导出失败!);
+            e.printStackTrace();
+        } catch (IOException e) {
+            //JOptionPane.showMessageDialog(null, 导出失败!);
+            e.printStackTrace();
+        }
+		
+		
+		
+		
+		
+2017年11月8日10:20:13
+在AndroidStudio中创建Java项目，运行后，发现打出的字符串都是乱码，这可急坏我了，上网查了下，说是字符串转码问题，让后是
+各种是转码，但是到最后，自己想了下是不是项目工程不是UTF-8运行环境啊，看了下配置文件，发现也不是这里的问题，没法了，只能
+死马当活马医了，看看是不是运行环境编码格式对吗，这个时候上网查了下，需要在对应的工程目录下build.gradle文件中添加如下配置项
+//新版
+tasks.withType(JavaCompile) { 
+    options.encoding = "UTF-8"
+}
+//旧版
+tasks.withType(Compile) { 
+    options.encoding = "UTF-8"
+}
+
+让后重新运行，发现输出结果正常了。over。
+
+
+
+2017年11月8日11:09:47
+Android动态权限处理
+参考网址：http://www.cnblogs.com/whoislcj/p/6064710.html
+http://blog.csdn.net/zhou452840622/article/details/51721367
+//判断版本是否是Android6.0以上
+boolean flag = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+
+	/**
+     * 判断当前权限是否拥有授权
+     * @param permission  权限名
+     * @return  true 表示已授权
+     *           false 表示未授权
+     */
+    private boolean isGatherPermission(String permission){
+        int checkSelfPermission = ContextCompat.checkSelfPermission(this, permission);
+        if (checkSelfPermission == PackageManager.PERMISSION_GRANTED){
+            return true;
+        }
+        return false;
+    }
+	
+2017年11月10日09:58:48
+参考网址：http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2017/0910/8491.html
+如果引用的第三方库的支持库版本低于（或者不一致）app build.gradle中的支持库版本，可能会出现如下问题：
+
+all com.android.support libraries must use the exact same version specification(mixing versions can lead to runtime crashes)
+
+去改第三方库所用的支持库版本比较麻烦，如果用的库很多的话工作量很大。这个时候我们可以考虑强制让所有模块都用相同的支持库版本。
+在app build.gradle中添加：
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == 'com.android.support') {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion '25.3.1'
+            }
+        }
+    }
+}
+其中，25.3.1就是你要使用的支持库版本号，你可以根据需要改成其它的。
+
+------------------------------------------------------------------------
+2017-12-11 16:02:01
+viewpager 加载数据
+http://www.jianshu.com/p/6fabf634d5bd
+
+-------------------------------------------------------------------------
+SmartRefreshLayout页面回弹效果设置，如下xml
+<com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:srlEnablePureScrollMode="true"
+        app:srlEnableLoadmore="true"
+        app:srlDragRate="1">
+
+------------------------------------------------------------------------------
+2017-12-12 09:44:59
+APIClound  APP开发定制
+网址API 
+https://docs.apicloud.com/APICloud/APP-custom-info
+控制平台
+https://www.apicloud.com/appoverview
+今天晚上回去了解内容
+/////////////////////////////////////////////////////////////////////////////
+
+
+------------------------------------------------------------------------------
+2017-12-22 17:04:54
+Axure RP 软件工具
+原型设计工具
+测试手机页面滑动效果---
+网址说明：http://www.woshipm.com/rp/340014.html
+模拟手机端纵向滑动的效果
+----------------------------------------------------------------------------
+Android引用框架XDroid项目-------
+
+
+三维Cesium App Demo 开发
+
+bingMap  key 
+网址：https://www.bingmapsportal.com/Resources
+实现APP开发
+http://blog.csdn.net/danfengw/article/details/52794625
+
+http://www.doc88.com/p-1505675704993.html
+
+-------------------------------------------------------
+requireJS学习
+JS页面 报 $ is not a function问题，解决方法如下：
+1）今天在做项目时，碰到了一个超奇怪的问题。我在html中的程序，跑的好好的，换成jsp在项目中跑，就一直报$ is not a function错。找了很久，试了很多，都没解决。后来，突然想到，将我引入的js文件的顺序换一下，将jquery的js文件第一个引入，别的js文件放到它后面。真的解决了问题！！！原来，在页面加载时，顺序加载引入的文件。要是jquery的js文件不是第一个被引入，那么别的js中的$.方法名就会报错。只有先引入了jquery的js文件，才能正确执行$.方法。特此备份！ 
+2）其实非常简单：$已经在其他包中当做了一个变量，别忘了一个页面可以引入多个不同的JavaScript脚本库，怎么解决呢——将$换成jQuery即可，例如：把“$('userName').val();”改成“jQuery('userName').val();”
+简单介绍网址：https://www.jianshu.com/p/b8a6824c8e07
+
+Cesium实现天地图网址：https://www.cnblogs.com/laixiangran/p/5049198.html
+
+------------------------------------------------------------------
+2017-12-28 15:37:08
+Android Studio动态权限加载，使用Google提供的EasyPermissions项目；
+GitHub网址：https://github.com/googlesamples/easypermissions
+引入这个包之后，就可以直接调用自己想要的动态权限配置了。
+
+------------------------------------------------------------------
+2018-1-3 10:56:35
+Android Studio引入library项目出现错误
+dependency 'com.google.code.findbugs:jsr305' in project ':app'
+解决方案网址：http://blog.csdn.net/u012230055/article/details/77947728
+在build.gradle中添加如下代码：
+
+android {
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
+    }
+}
+这里有点疑惑，findbugs的版本号不知道是不是可以修改。上面那段代码是可以解决这个bug的。
+-------------------------------------------------------------------------------
+BufferKife注解使用出现空指针，
+http://blog.csdn.net/panhongzhi02/article/details/60141377
+解决方案：因为在7.0之后，使用了新的注解方式，所以需要配置环境。
+BufferKife 8.0之后，使用了新的注解方式，所以需要配置环境。
+第一步：在项目下build.gradle文件dependencies中添加
+dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+}
+第二步：在应用APP项目中，先引用：
+apply plugin: 'com.neenbedankt.android-apt'
+第三步：在应用APP项目中，dependencies节点下添加：
+compile 'com.jakewharton:butterknife:8.4.0'
+apt 'com.jakewharton:butterknife-compiler:8.4.0'
+如此可以解决空指针问题。
+
+-------------------------------------------------------------------------------
+RecyclerView侧滑菜单，Item拖拽，滑动删除Item，自动加载更多，HeaderView，FooterView，Item分组黏贴。
+https://github.com/yanzhenjie/SwipeRecyclerView
+------------------------------------------------------------------------------
+Android 7.0版本打开相机的工作网址：
+http://blog.csdn.net/ww897532167/article/details/71525514
+
+----------------------------------------------------------------------------------
+
+2018-1-23 11:39:51
+Android页面启动时隐藏软键盘，有以下几种方式：
+隐藏软键盘：
+((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(WidgetSearchActivity.this.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);   
+2、//显示软键盘,控件ID可以是EditText,TextView   
+
+((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).showSoftInput(控件ID, 0); 
+3、不自动弹出键盘：
+
+带有EditText控件的在第一次显示的时候会自动获得focus，并弹出键盘，如果不想自动弹出键盘，有两种方法：
+
+方法一：在mainfest文件中把对应的activity设置
+
+android:windowSoftInputMode="stateHidden" 或者android:windowSoftInputMode="stateUnchanged"。
+
+方法二：可以在布局中放一个隐藏的TextView，然后在onCreate的时候requsetFocus。
+
+注意TextView不要设置Visiable=gone，否则会失效
+
+，可以在布局中放一个隐藏的TextView，然后在onCreate的时候requsetFocus。
+
+注意TextView不要设置Visiable=gone，否则会失效
+
+<TextView
+
+        android:id="@+id/text_notuse"
+
+        android:layout_width="wrap_content"
+
+        android:layout_height="wrap_content"
+
+        android:focusable="true"
+
+android:focusableInTouchMode="true"
+
+        />
+
+ 
+
+TextView textView = (TextView)findViewById(R.id.text_notuse);
+
+            textView.requestFocus();
+--------------------------------------------------------------------------------------
+2018-1-24 11:16:30
+Android RecyclerView 添加分隔线，可以使用v7包中自带的Deliver类;
+
+---------------------------------------------------------------------------------------
+2018-1-25 19:28:03
+Android drawText获取text宽度的三种方式
+String str = "Hello";  
+canvas.drawText( str , x , y , paint);  
+  
+//1. 粗略计算文字宽度  
+Log.d(TAG, "measureText=" + paint.measureText(str));  
+  
+//2. 计算文字所在矩形，可以得到宽高  
+Rect rect = new Rect();  
+paint.getTextBounds(str, 0, str.length(), rect);  
+int w = rect.width();  
+int h = rect.height();  
+Log.d(TAG, "w=" +w+"  h="+h);  
+  
+//3. 精确计算文字宽度  
+int textWidth = getTextWidth(paint, str);  
+Log.d(TAG, "textWidth=" + textWidth);  
+  
+    public static int getTextWidth(Paint paint, String str) {  
+        int iRet = 0;  
+        if (str != null && str.length() > 0) {  
+            int len = str.length();  
+            float[] widths = new float[len];  
+            paint.getTextWidths(str, widths);  
+            for (int j = 0; j < len; j++) {  
+                iRet += (int) Math.ceil(widths[j]);  
+            }  
+        }  
+        return iRet;  
+    }  
+---------------------------------------------------------------------------------------
+Android studio 出现引用包重复问题
+http://blog.csdn.net/mwq384807683/article/details/71402900
+解决方案：
+
+
+--------------------------------------------------------------------------------------
+2018-3-7 10:11:08
+Tomcat服务器部署：文件列表，可以访问。
+由于之前部署的IIS出问题，而我今后不想总是去维护IIS，卸载、重装。故想改用Tomcat来发布我的文件目录。有点类似于文件系统。
+    在公司同事的帮助下，原来只需要修改配置里的一个参数项就可以了。在配置文件里找到web.xml，将这个参数<param-name>listings</param-name>的值<param-value>false</param-value>
+	由false改为true即可将放在webapps下的一个文件目录发布出来啦！
+    又学习了一样，心里感到很开心。虽然对于别人可能很简单，但是自己感觉在不停的进步，有可供学习的东西就很开心。
+--------------------------------------------------------------------------------------2018-3-21 14:34:37
+
+Windows  git 命令使用
+
+1.在Git官网上，下载安装包，直接安装。在安装完成后，在开始菜单中找到"Git"--->"Git Bash",蹦出一个类似命令行的窗口的东西，这个时候说明Git安装成功！
+
+2.安装完成后，还需要最后一步设置，在命令行输入：
+$  git config --global user.name="Your name"
+$  git config --global user.email="email@example.com"
+
+因为Git是分布式版本控制系统，所以，每个机器都必须自爆家门：你的名字和Email地址。你也会担心，如果有人故意冒充别人怎么办？这个不必担心，首先我们相信大家都是善良物质的群众，其次，真的有冒充的也是有办法可以查看的。
+注意 git config 命令的 --global 参数，用了这个参数，表示你这台机器上所有的Git仓库都会使用这个配置，当然也可以对某个仓库制定不同的用户名和Email地址。
+
+3. 创建版本库 
+ 初始化一个GIt仓库，使用 git init 命令.
+ 添加文件到Git仓库，分为两步：
+   第一步，使用命令 git add <file> , 注意，可反复多次使用，添加多个文件。
+   第二步，使用 git commit ，完成.(其后面可以跟 -m "本次更新内容备注").
+
+4. Git历史版本
+  HEAD 的版本是当前版本，因此，Git允许我们在版本之间穿梭，使用命令：
+ git reset --hard commit_ID
+ 穿梭前，用git log 可以查看提交历史，以便要确定回退至哪个版本。
+ 要重返未来， 用  git reflog 查看命令历史，以便确定回到未来哪个版本。
+
+5. Git暂存区概念、作用，以及在此工作区内都做了什么。
+
+6. 管理修改
+    每次修改完文件后，都应该及时，使用命令 git add <file> ，让后git commit 添加文件至暂存区。
+7. 撤销修改
+ 场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令 git checkout --  file
+ 场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想要丢弃修改，分为两步走，第一步用命令  git reset HEAD  file , 就回到了场景1， 第二步按场景1操作。
+ 场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退一节，不过前提是没有推送到远程库。
+
+8. 删除文件操作。
+  命令 git rm  用于删除一个文件。如果一个文件已经提交到版本库，那么你永远不用担心误删，但是要小心，你只能恢复文件到最新版本，你会丢失最近一次提交后你修改的内容。
+
+9. 远程仓库
+先有本地库，后有远程库的时候，如何关联远程库。
+  添加远程库：
+ 1. 要关联一个远程库，使用命令 git remote add origin git@server-name:path/repo-name.git  ;
+ 2. 关联后，使用命令  git push -u origin master  第一次推送master分支的所有内容；
+ 3. 此后，每次本地提交后，只要有必要，可以使用命令 git push origin master  推送最新修改； 
+ 分布式版本系统的最大好处之一实在本地工作完全不需要考虑远程库的存在，也就是没有互联网都可以正常工作，而SVN在没有联网的时候是拒绝干活的！当有网络的时候，再把本地提交推送一下就可以完成了同步，真是太方便了。
+
+10  从远程库克隆项目
+ 假设我们从零开发，那么最好的方式是先创建远程库，然后，从远程库克隆。
+想要克隆一个仓库，首先必须知道仓库的地址，让后使用 git clone pro-path 命令克隆；
+git支持多种协议，包括htttps , 但通过 ssh  支持的原生 git  协议速度最快.
+
+11  分支管理 
+  Git 鼓励大量使用分支：
+ 查看分支： git branch
+ 创建分支： git branch <name>
+ 切换分支： git checkout <name>
+ 创建+切换分支： git checkout -b <name>
+ 合并某分支到当前分支： git merge <name>
+ 删除分支： git branch -d <name>
+
+12  解决冲突
+  当混账无法自动合并分支时，就必须首先解决冲突。解决冲突后，再提交，合并完成。
+ 用 git log --graph 命令可以看到分支合并图产品。
+
+13  分支管理策略
+  Git分支十分强大，在团队开发中应该充分应用。
+  合并分支时，加上 --no-ff  参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而  fast  forward  合并就看不出来曾经做过合并。
+
+ 事例： 
+  1. 首先，创建并切换 dev 分支：
+    git checkout -b dev
+  2. 修改readme.txt文件，并提交一个新的commit：
+    git add readme.txt
+    git commit -m "add merge" 
+  3. 现在我们切换回master ：
+    git checkout master
+  4. 准备合并 dev 分支，请注意  --no-ff  参数，表示禁用 Fast forward :
+    git merge --no-ff -m "merge with no-ff" dev
+因为本次合并要创建一个新的commit，所以加上-m参数，把commit描述写进去。
+  5. 合并后，用 git log 命令看看分支历史：
+    git log --graph --pretty=oneline --abbrev-commit
+
+
+14  Bug分支  
+   修复bug时，我们会通过创建新的bug分支进行修复，让后合并，最后删除；
+   当手头工作没有完成时，可以先把工作现场  git stash  一下，让后去修改bug；修复后， 在回到工作现场，先用 git stash list 查看当前保存的工作现场，让后 用命令  git stash pop 回复到保存的状态，让后回到工作现场，进行工作。
+
+15  开发新功能
+   开发一个新的feature，最好新建一个分支；
+   如果要丢弃一个没有被合并过的分支，可以通过 git branch -D <name> 强行删除。
+16  多人开发模式
+   多人协作的工作模式通常是这样：
+    1. 首先，可以试图用 git push origin branch-name 推送自己的修改；
+    2. 如果推送失败，则因为远程分支比你的本地更新，需要先用 git pull 试图合并；
+    3. 如果合并没有冲突，则解决冲突，并在本地提交；
+    4. 没有冲突或者解决冲突后，再用 git push origin branch-name 推送就能成功！
+   如果 git pull 提示 no  trancking information ， 则说明本地分支和远程分支的连接没有创建，则用命令 git branch --set-upstream branch-name origin/branch-name。 这就是多人协作的工作模式，一旦熟悉了，就非常简单。
+  小结：
+   查看远程库信息，使用 git remote -v.
+   本地新建的分支如果不推送到远程，对其他人就是不可见的；
+   从本地推送分支，使用  git push origin branch-name , 如果推送失败，先用 git pull  西安抓去远程的新提交；
+   从本地创建和远程分支对应的分支 ， 使用  git  checkout -b branch-name origin/branch-name  , 本地和远程分支的名称最好一致；
+   建立本地分支和远程分支的关联，使用  git branch  --set-upstream branch-name origin/branch-name ; 
+   从远程抓取分支，使用  git pull , 如果有冲突，要优先处理冲突。
+
+17   创建标签  
+    命令  git tag <name> 用于新建一个标签，默认为 HEAD ， 也可以指定一个commit id ；
+    git tag -a <tagname> -m "blablabla...."  指定标签信息；
+    git  tag -s <tagname> -m "blablabla.....",可以用PGP签名标签；
+    命令  git tag 可以查看所有标签信息。
+
+18   操作标签
+   如果标签打错了，也可以删除：
+   git  tag -d v1.0.0
+   创建的标签都只存储在本地，不会自动推送到远程。所以，打错的标签可以在本地安全删除。
+如果要推送某个标签到远程，使用命令： git push origin <tagname>
+或者，一次性推送全部尚未推送到远程的本地标签：
+git push origin --tags
+
+   如果标签已经推送到远程，要删除远程标签就麻烦一点，先删除本地标签：
+   git tag -d V1.0.0
+ 让后，从远程删除。删除命令也是push，格式如下：
+  git  push origin :refs/tags/V1.0.0
+    小结：
+   命令： git push  origin <tagname> 可以推送一个本地标签
+   命令： git push origin --tags  可以推送全部未推送过的本地标签；
+   命令： git tag -d <tagname> 可以删除一个本地标签；
+   命令： git push origin :refs/tags/<tagname> 可以是删除一个远程标签。
+
+19 忽略某些文件
+    忽略某些文件是,需要编写 .gitignore ;
+    .gitignore 文件本身需要放到版本库了，并且可以对 .gitignore 做版本管理。
+
+20  配置别名 
+     有没有经常敲错命令？ 比如 git status ? status 这个单词真心不好记。
+     如果敲  git st 就表示 git status 那就简单多了，当前这种偷懒的办法我们是极力赞成的。
+     我们只需要敲一行命令，告诉 Git ，以后 st  就表示 status ： 
+    命令： git  config --global alias st status
+
+   好了，现在敲 git st 看看效果。
+  当然还有别的命令，可以简写，很多人都co 表示checkout  ，ci 表示commit ， br  表示branch： 
+   git config --global alias co checkout
+   git config --global alias ci commit
+   git config --global alias br branch
