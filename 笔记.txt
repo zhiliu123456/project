@@ -558,7 +558,501 @@ AsyncTask 异步任务
 
 
 
+--------------------------------------------------------------------------------------
+
+2018-4-2 16:21:52
+
+Android横竖屏切换
+1。 先说下如何禁止屏幕横竖屏自动切换吧，很简单，在AndroidManifest.xml中为Activity添加一个属性：android:screenOrientation  , 游侠苏可选值：
+
+ unspecified: 默认值 由系统来判断显示方向。判定的策略是和设备相关的，所以不同的设备会有不同的显示方向。
+ landscape：横屏显示（宽比高要长）
+ portrait： 竖屏显示（高比宽要长）
+ user:  用户当前首选的方向。
+ behind: 和该Activity下面的那个Activity的方向一致（在Activity堆栈中的）
+ sensor: 有物理的感应器决定。如果用户旋转设备这屏幕会横竖屏切换。
+ nosensor: 忽略物理感应器，这样就不会随着用户旋转设备而更改（"unspecified"设置除外）。
+2。 横竖屏想加载不同的布局：
+ 1) 准备两套不同的布局，Android会自己根据横竖屏加载不同布局：创建两个布局文件夹：layout-land横屏，layout-port竖屏 ，让后把两套布局丢这两文件夹里，文件名一样，Android就会自行判断，让后加载相应的布局了。
+ 2) 自己在代码中进行判断，自己想加载什么就加载什么。
+  我们一般是在onCreate()方法中加载布局文件的，我们可以在这里对横竖屏的状态进行判断，关键代码如下：
+  if(this.getResource().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+    	setContentView(R.layout.横屏);
+} else if(this.getResource().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT){
+    	setContentView(R.layout.竖屏);
+}
+
+3。 系统给我们提供的常见的Activity
+好的，最后给大家附上一些系统给我们提供的一些常见的Activtiy吧！
+
+//1.拨打电话
+// 给移动客服10086拨打电话
+Uri uri = Uri.parse("tel:10086");
+Intent intent = new Intent(Intent.ACTION_DIAL, uri);
+startActivity(intent);
+
+//2.发送短信
+// 给10086发送内容为“Hello”的短信
+Uri uri = Uri.parse("smsto:10086");
+Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+intent.putExtra("sms_body", "Hello");
+startActivity(intent);
+
+//3.发送彩信（相当于发送带附件的短信）
+Intent intent = new Intent(Intent.ACTION_SEND);
+intent.putExtra("sms_body", "Hello");
+Uri uri = Uri.parse("content://media/external/images/media/23");
+intent.putExtra(Intent.EXTRA_STREAM, uri);
+intent.setType("image/png");
+startActivity(intent);
+
+//4.打开浏览器:
+// 打开Google主页
+Uri uri = Uri.parse("http://www.baidu.com");
+Intent intent  = new Intent(Intent.ACTION_VIEW, uri);
+startActivity(intent);
+
+//5.发送电子邮件:(阉割了Google服务的没戏!!!!)
+// 给someone@domain.com发邮件
+Uri uri = Uri.parse("mailto:someone@domain.com");
+Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+startActivity(intent);
+// 给someone@domain.com发邮件发送内容为“Hello”的邮件
+Intent intent = new Intent(Intent.ACTION_SEND);
+intent.putExtra(Intent.EXTRA_EMAIL, "someone@domain.com");
+intent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+intent.putExtra(Intent.EXTRA_TEXT, "Hello");
+intent.setType("text/plain");
+startActivity(intent);
+// 给多人发邮件
+Intent intent=new Intent(Intent.ACTION_SEND);
+String[] tos = {"1@abc.com", "2@abc.com"}; // 收件人
+String[] ccs = {"3@abc.com", "4@abc.com"}; // 抄送
+String[] bccs = {"5@abc.com", "6@abc.com"}; // 密送
+intent.putExtra(Intent.EXTRA_EMAIL, tos);
+intent.putExtra(Intent.EXTRA_CC, ccs);
+intent.putExtra(Intent.EXTRA_BCC, bccs);
+intent.putExtra(Intent.EXTRA_SUBJECT, "Subject");
+intent.putExtra(Intent.EXTRA_TEXT, "Hello");
+intent.setType("message/rfc822");
+startActivity(intent);
+
+//6.显示地图:
+// 打开Google地图中国北京位置（北纬39.9，东经116.3）
+Uri uri = Uri.parse("geo:39.9,116.3");
+Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+startActivity(intent);
+
+//7.路径规划
+// 路径规划：从北京某地（北纬39.9，东经116.3）到上海某地（北纬31.2，东经121.4）
+Uri uri = Uri.parse("http://maps.google.com/maps?f=d&saddr=39.9 116.3&daddr=31.2 121.4");
+Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+startActivity(intent);
+
+//8.多媒体播放:
+Intent intent = new Intent(Intent.ACTION_VIEW);
+Uri uri = Uri.parse("file:///sdcard/foo.mp3");
+intent.setDataAndType(uri, "audio/mp3");
+startActivity(intent);
+
+//获取SD卡下所有音频文件,然后播放第一首=-= 
+Uri uri = Uri.withAppendedPath(MediaStore.Audio.Media.INTERNAL_CONTENT_URI, "1");
+Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+startActivity(intent);
+
+//9.打开摄像头拍照:
+// 打开拍照程序
+Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); 
+startActivityForResult(intent, 0);
+// 取出照片数据
+Bundle extras = intent.getExtras(); 
+Bitmap bitmap = (Bitmap) extras.get("data");
+
+//另一种:
+//调用系统相机应用程序，并存储拍下来的照片
+Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE); 
+time = Calendar.getInstance().getTimeInMillis();
+intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment
+.getExternalStorageDirectory().getAbsolutePath()+"/tucue", time + ".jpg")));
+startActivityForResult(intent, ACTIVITY_GET_CAMERA_IMAGE);
+
+//10.获取并剪切图片
+// 获取并剪切图片
+Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+intent.setType("image/*");
+intent.putExtra("crop", "true"); // 开启剪切
+intent.putExtra("aspectX", 1); // 剪切的宽高比为1：2
+intent.putExtra("aspectY", 2);
+intent.putExtra("outputX", 20); // 保存图片的宽和高
+intent.putExtra("outputY", 40); 
+intent.putExtra("output", Uri.fromFile(new File("/mnt/sdcard/temp"))); // 保存路径
+intent.putExtra("outputFormat", "JPEG");// 返回格式
+startActivityForResult(intent, 0);
+// 剪切特定图片
+Intent intent = new Intent("com.android.camera.action.CROP"); 
+intent.setClassName("com.android.camera", "com.android.camera.CropImage"); 
+intent.setData(Uri.fromFile(new File("/mnt/sdcard/temp"))); 
+intent.putExtra("outputX", 1); // 剪切的宽高比为1：2
+intent.putExtra("outputY", 2);
+intent.putExtra("aspectX", 20); // 保存图片的宽和高
+intent.putExtra("aspectY", 40);
+intent.putExtra("scale", true);
+intent.putExtra("noFaceDetection", true); 
+intent.putExtra("output", Uri.parse("file:///mnt/sdcard/temp")); 
+startActivityForResult(intent, 0);
+
+//11.打开Google Market 
+// 打开Google Market直接进入该程序的详细页面
+Uri uri = Uri.parse("market://details?id=" + "com.demo.app");
+Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+startActivity(intent);
+
+//12.进入手机设置界面:
+// 进入无线网络设置界面（其它可以举一反三）  
+Intent intent = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);  
+startActivityForResult(intent, 0);
+
+//13.安装apk:
+Uri installUri = Uri.fromParts("package", "xxx", null);   
+returnIt = new Intent(Intent.ACTION_PACKAGE_ADDED, installUri);
+
+//14.卸载apk:
+Uri uri = Uri.fromParts("package", strPackageName, null);      
+Intent it = new Intent(Intent.ACTION_DELETE, uri);      
+startActivity(it); 
+
+//15.发送附件:
+Intent it = new Intent(Intent.ACTION_SEND);      
+it.putExtra(Intent.EXTRA_SUBJECT, "The email subject text");      
+it.putExtra(Intent.EXTRA_STREAM, "file:///sdcard/eoe.mp3");      
+sendIntent.setType("audio/mp3");      
+startActivity(Intent.createChooser(it, "Choose Email Client"));
+
+//16.进入联系人页面:
+Intent intent = new Intent();
+intent.setAction(Intent.ACTION_VIEW);
+intent.setData(People.CONTENT_URI);
+startActivity(intent);
+
+//17.查看指定联系人:
+Uri personUri = ContentUris.withAppendedId(People.CONTENT_URI, info.id);//info.id联系人ID
+Intent intent = new Intent();
+intent.setAction(Intent.ACTION_VIEW);
+intent.setData(personUri);
+startActivity(intent);
+
+4。 知晓当前是哪个Activity
+
+让所有的Activity继承一个自定义的BaseActivity类，在OnCreate()方法中添加下述语句即可：
+log.e("BaseActivity",getClass().getSimpleName());
+
+5。 随时关闭所有的Activity
+  有时我们可能会打开很多个Activity，突然来个这样的需求，在某个页面可以关掉所欲的Activity并退出程序！好吧，下面提供一个关闭所有Activity的方法，就是用一个list集合来存储所有的Activity！
+  1） 创建一个Activity管理类：ActivityCollector
+   定义三个共有静态方法：定义存储Activity的list集合，方法如下：
+   a： addActbivity:往集合添加Activity对象
+   b： removeActivity: 移除Activity中的对象
+   c： finishAll: 增强for循环便利所有Activity调用
+ 	if(!activity.isFinishing())
+   		activity.finish();
+  2)  BaseActivity 中
+    a: onCreate()方法中添加
+        ActivityCollector.addActivity(this);
+    b: onDestory()方法添加
+        ActivityCollector.removeActivity(this);
+    c: 在任意一个Activity中调用：
+        ActivityCollector.finishAll();
+       从而关闭所有的Activity，退出app!
+
+------------------------------------------------------------------------------------
+2018-4-3 13:51:29
+
+1.  Bundle 传递数据
+
+注意： 在使用Bundle传递数据时,要注意，Bundle的大小是有限制的 < 0.5MB , 如果大于这个值  会报 TransactionTooLargeException 异常的！！！！
+
+2.  使用命令行查看当前所有的Activity的命令：
+ 使用下述命令即可，前提是你为SDK配置了环境变量： adb shell dumpsys activity
+
+3.  设置Activity全屏的方法：
+ 1） 代码隐藏ActionBar
+在Activity的OnCreate方法中调用getActionBar.hide(); 即可
+ 2） 通过requestWindowFeature设置
+requestWindowFeature(Window.FEATURE_NO_TITLE); 该代码需要在setContentView()之前调用，不然会报错!!!!!!!!
+ 3)  通过AndroidManifest.xml的theme
+在需要全屏的Activity的标签内设置theme="@android:style/Theme.NoTitleBar.FullScreen"
+
+4.  定义对话框风格的Activity
+
+ 直接设置下Activity的theme:
+	android:theme="@android:style/Theme.Dialog"
+ 这样就可以了，当然你也可以设置下标题，小图标等等。
+//设置左上角小图标
+requestWindowFeature(Window.FEATURE_LEFT_ICON);
+setContentView(R.layout.main);
+getWindow().setFeatureDrawableResource(Window.FEATURE_LEFT_ICON, android.R.drawable.ic_lion_icon);
+//设置文字:
+setTitle(R.string.actdialog_title);  //XML代码中设置:android:label="@string/activity_dialog"
 
 
+---------------------------------------------------------------------------------
+2018-4-3 14:20:43
 
+开源中国客户端Activity管理类：
+package net.oschina.app;
 
+import java.util.Stack;
+
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
+
+public class AppManager {
+
+    private static Stack<Activity> activityStack;
+    private static AppManager instance;
+
+    private AppManager(){}
+    /**
+     * 单一实例
+     */
+    public static AppManager getAppManager(){
+        if(instance==null){
+            instance=new AppManager();
+        }
+        return instance;
+    }
+    /**
+     * 添加Activity到堆栈
+     */
+    public void addActivity(Activity activity){
+        if(activityStack==null){
+            activityStack=new Stack<Activity>();
+        }
+        activityStack.add(activity);
+    }
+    /**
+     * 获取当前Activity（堆栈中最后一个压入的）
+     */
+    public Activity currentActivity(){
+        Activity activity=activityStack.lastElement();
+        return activity;
+    }
+    /**
+     * 结束当前Activity（堆栈中最后一个压入的）
+     */
+    public void finishActivity(){
+        Activity activity=activityStack.lastElement();
+        finishActivity(activity);
+    }
+    /**
+     * 结束指定的Activity
+     */
+    public void finishActivity(Activity activity){
+        if(activity!=null){
+            activityStack.remove(activity);
+            activity.finish();
+            activity=null;
+        }
+    }
+    /**
+     * 结束指定类名的Activity
+     */
+    public void finishActivity(Class<?> cls){
+        for (Activity activity : activityStack) {
+            if(activity.getClass().equals(cls) ){
+                finishActivity(activity);
+            }
+        }
+    }
+    /**
+     * 结束所有Activity
+     */
+    public void finishAllActivity(){
+        for (int i = 0, size = activityStack.size(); i < size; i++){
+            if (null != activityStack.get(i)){
+                activityStack.get(i).finish();
+            }
+        }
+        activityStack.clear();
+    }
+    /**
+     * 退出应用程序
+     */
+    public void AppExit(Context context) {
+        try {
+            finishAllActivity();
+            ActivityManager activityMgr= (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+            activityMgr.restartPackage(context.getPackageName());
+            System.exit(0);
+        } catch (Exception e) { }
+    }
+}
+
+---------------------------------------------------------------------------
+2018-4-3 17:42:11
+3.常用的系统广播总结：
+
+最后给大家提供下我们平常可能会用到的一些系统广播吧：
+Intent.ACTION_AIRPLANE_MODE_CHANGED;
+//关闭或打开飞行模式时的广播
+
+<strong>Intent.ACTION_BATTERY_CHANGED;
+//充电状态，或者电池的电量发生变化
+//电池的充电状态、电荷级别改变，不能通过组建声明接收这个广播，只有通过Context.registerReceiver()注册
+
+<strong>Intent.ACTION_BATTERY_LOW;
+//表示电池电量低
+
+<strong>Intent.ACTION_BATTERY_OKAY;
+//表示电池电量充足，即从电池电量低变化到饱满时会发出广播
+
+Intent.ACTION_BOOT_COMPLETED;
+//在系统启动完成后，这个动作被广播一次（只有一次）。
+
+Intent.ACTION_CAMERA_BUTTON;
+//按下照相时的拍照按键(硬件按键)时发出的广播
+
+Intent.ACTION_CLOSE_SYSTEM_DIALOGS;
+//当屏幕超时进行锁屏时,当用户按下电源按钮,长按或短按(不管有没跳出话框)，进行锁屏时,android系统都会广播此Action消息
+
+Intent.ACTION_CONFIGURATION_CHANGED;
+//设备当前设置被改变时发出的广播(包括的改变:界面语言，设备方向，等，请参考Configuration.java)
+
+Intent.ACTION_DATE_CHANGED;
+//设备日期发生改变时会发出此广播
+
+Intent.ACTION_DEVICE_STORAGE_LOW;
+//设备内存不足时发出的广播,此广播只能由系统使用，其它APP不可用？
+
+Intent.ACTION_DEVICE_STORAGE_OK;
+//设备内存从不足到充足时发出的广播,此广播只能由系统使用，其它APP不可用？
+
+Intent.ACTION_DOCK_EVENT;
+//
+//发出此广播的地方frameworksase\services\java\com\android\server\DockObserver.java
+
+Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE;
+////移动APP完成之后，发出的广播(移动是指:APP2SD)
+
+Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE;
+//正在移动APP时，发出的广播(移动是指:APP2SD)
+
+Intent.ACTION_GTALK_SERVICE_CONNECTED;
+//Gtalk已建立连接时发出的广播
+
+Intent.ACTION_GTALK_SERVICE_DISCONNECTED;
+//Gtalk已断开连接时发出的广播
+
+Intent.ACTION_HEADSET_PLUG;
+//在耳机口上插入耳机时发出的广播
+
+Intent.ACTION_INPUT_METHOD_CHANGED;
+//改变输入法时发出的广播
+
+Intent.ACTION_LOCALE_CHANGED;
+//设备当前区域设置已更改时发出的广播
+
+Intent.ACTION_MANAGE_PACKAGE_STORAGE;
+//
+
+Intent.ACTION_MEDIA_BAD_REMOVAL;
+//未正确移除SD卡(正确移除SD卡的方法:设置--SD卡和设备内存--卸载SD卡)，但已把SD卡取出来时发出的广播
+//广播：扩展介质（扩展卡）已经从 SD 卡插槽拔出，但是挂载点 (mount point) 还没解除 (unmount)
+
+Intent.ACTION_MEDIA_BUTTON;
+//按下"Media Button" 按键时发出的广播,假如有"Media Button" 按键的话(硬件按键)
+
+Intent.ACTION_MEDIA_CHECKING;
+//插入外部储存装置，比如SD卡时，系统会检验SD卡，此时发出的广播?
+Intent.ACTION_MEDIA_EJECT;
+//已拔掉外部大容量储存设备发出的广播（比如SD卡，或移动硬盘）,不管有没有正确卸载都会发出此广播?
+//广播：用户想要移除扩展介质（拔掉扩展卡）。
+Intent.ACTION_MEDIA_MOUNTED;
+//插入SD卡并且已正确安装（识别）时发出的广播
+//广播：扩展介质被插入，而且已经被挂载。
+Intent.ACTION_MEDIA_NOFS;
+//
+Intent.ACTION_MEDIA_REMOVED;
+//外部储存设备已被移除，不管有没正确卸载,都会发出此广播？
+// 广播：扩展介质被移除。
+Intent.ACTION_MEDIA_SCANNER_FINISHED;
+//广播：已经扫描完介质的一个目录
+Intent.ACTION_MEDIA_SCANNER_SCAN_FILE;
+//
+Intent.ACTION_MEDIA_SCANNER_STARTED;
+//广播：开始扫描介质的一个目录
+
+Intent.ACTION_MEDIA_SHARED;
+// 广播：扩展介质的挂载被解除 (unmount)，因为它已经作为 USB 大容量存储被共享。
+ Intent.ACTION_MEDIA_UNMOUNTABLE;
+//
+Intent.ACTION_MEDIA_UNMOUNTED
+// 广播：扩展介质存在，但是还没有被挂载 (mount)。
+Intent.ACTION_NEW_OUTGOING_CALL;
+
+Intent.ACTION_PACKAGE_ADDED;
+//成功的安装APK之后
+//广播：设备上新安装了一个应用程序包。
+//一个新应用包已经安装在设备上，数据包括包名（最新安装的包程序不能接收到这个广播）
+ Intent.ACTION_PACKAGE_CHANGED;
+//一个已存在的应用程序包已经改变，包括包名
+Intent.ACTION_PACKAGE_DATA_CLEARED;
+//清除一个应用程序的数据时发出的广播(在设置－－应用管理－－选中某个应用，之后点清除数据时?)
+//用户已经清除一个包的数据，包括包名（清除包程序不能接收到这个广播）
+
+Intent.ACTION_PACKAGE_INSTALL;
+//触发一个下载并且完成安装时发出的广播，比如在电子市场里下载应用？
+//
+Intent.ACTION_PACKAGE_REMOVED;
+//成功的删除某个APK之后发出的广播
+//一个已存在的应用程序包已经从设备上移除，包括包名（正在被安装的包程序不能接收到这个广播）
+
+Intent.ACTION_PACKAGE_REPLACED;
+//替换一个现有的安装包时发出的广播（不管现在安装的APP比之前的新还是旧，都会发出此广播？）
+Intent.ACTION_PACKAGE_RESTARTED;
+//用户重新开始一个包，包的所有进程将被杀死，所有与其联系的运行时间状态应该被移除，包括包名（重新开始包程序不能接收到这个广播）
+Intent.ACTION_POWER_CONNECTED;
+//插上外部电源时发出的广播
+Intent.ACTION_POWER_DISCONNECTED;
+//已断开外部电源连接时发出的广播
+Intent.ACTION_PROVIDER_CHANGED;
+//
+
+Intent.ACTION_REBOOT;
+//重启设备时的广播
+
+Intent.ACTION_SCREEN_OFF;
+//屏幕被关闭之后的广播
+
+Intent.ACTION_SCREEN_ON;
+//屏幕被打开之后的广播
+
+Intent.ACTION_SHUTDOWN;
+//关闭系统时发出的广播
+
+Intent.ACTION_TIMEZONE_CHANGED;
+//时区发生改变时发出的广播
+
+Intent.ACTION_TIME_CHANGED;
+//时间被设置时发出的广播
+
+Intent.ACTION_TIME_TICK;
+//广播：当前时间已经变化（正常的时间流逝）。
+//当前时间改变，每分钟都发送，不能通过组件声明来接收，只有通过Context.registerReceiver()方法来注册
+
+Intent.ACTION_UID_REMOVED;
+//一个用户ID已经从系统中移除发出的广播
+//
+
+Intent.ACTION_UMS_CONNECTED;
+//设备已进入USB大容量储存状态时发出的广播？
+
+Intent.ACTION_UMS_DISCONNECTED;
+//设备已从USB大容量储存状态转为正常状态时发出的广播？
+
+Intent.ACTION_USER_PRESENT;
+//
+
+Intent.ACTION_WALLPAPER_CHANGED;
+//设备墙纸已改变时发出的广播
