@@ -1045,7 +1045,8 @@ Intent.ACTION_UID_REMOVED;
 //一个用户ID已经从系统中移除发出的广播
 //
 
-Intent.ACTION_UMS_CONNECTED;
+I
+ntent.ACTION_UMS_CONNECTED;
 //设备已进入USB大容量储存状态时发出的广播？
 
 Intent.ACTION_UMS_DISCONNECTED;
@@ -1056,3 +1057,50 @@ Intent.ACTION_USER_PRESENT;
 
 Intent.ACTION_WALLPAPER_CHANGED;
 //设备墙纸已改变时发出的广播
+
+
+
+---------------------------------------------------------------------------------
+2018-4-4 10:33:34
+
+Android Studio 使用快捷键
+
+1. 要查看方法的所有出口点，例如  
+返回语句，然后按Ctrl + Shift + F7：
+
+---------------------------------------------------------------------------------
+2018-4-9 09:58:38
+
+Android BroadcastReceiver使用
+
+1. 上一节我们对BroadcastReceiver有一个初步的了解，知道了有两种广播类型：标准与有序，动态或静态注册广播接受者，监听系统广播，自己发送广播。但这些写的广播都是全局广播！这些有一些安全性的问题。Android提供了本地广播，使用该机制发出的广播只会在APP内部传播。而且广播接受者也只能收到本应用发出的广播。
+
+2.  本地广播
+ 1) 核心用法：
+   使用LocalBroadcastManager来管理广播：
+   a. 调用LocalBroadcastManager.getInstance()获取实例
+   b. 调用~.registerReceiver()注册广播
+   c. 调用~.sendBroadcast()发送广播
+   d. 调用~.unregisterReceiver()取消注册
+   PS：~代表 LocalBroadcastManager的实例
+
+PS: 本地广播无法通过静态注册方式来接受，相比起系统全局广播更加高效。
+ 2）注意事项：
+   a. 本地广播无法通过静态注册来接收！ 相比起系统全局广播更加高效
+   b. 在广播中起启动Activity的话，需要为intent加入FLAG_ACTIVITY_NEW_TASK 的标记，不然会报错，因为需要一个栈来存放新打开的Activity
+   c. 广播中弹出的AlertDialog的话，需要设置对话框的类型为TYPE_SYSTEM_ALERT 不然是无法弹出的~
+
+
+---------------------------------------------------------------------------------
+2018-4-9 10:41:33
+
+Android ContentProvider初识
+
+Storage Access Framework（SAF）: 存储访问框架，4.4 以后引入的一个新玩意，为用户浏览手机中的存储内容提供了便利，可供访问的内容不仅包括：文档、图片、视频、音频、下载，而且还包含所有由特定ContentProvider(须具有约定的API)提供的内容。
+其实就是一个内置的应用程序，叫做DocumentsUI,因为他的IntentFilter不带有LAUNCHER，所以我们并没有在桌面上找到这个程序！
+
+试试下面的代码可以找到存储访问框架
+ Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+ intent.addCategory(Intent.CATEGORY_OPENABLE);
+ intent.setType("image/*");
+ startActivity(intent);
