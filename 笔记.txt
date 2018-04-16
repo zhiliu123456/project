@@ -1101,6 +1101,90 @@ Storage Access Framework£¨SAF£©: ´æ´¢·ÃÎÊ¿ò¼Ü£¬4.4 ÒÔºóÒýÈëµÄÒ»¸öÐÂÍæÒâ£¬ÎªÓÃ»§ä
 
 ÊÔÊÔÏÂÃæµÄ´úÂë¿ÉÒÔÕÒµ½´æ´¢·ÃÎÊ¿ò¼Ü
  Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
- intent.addCategory(Intent.CATEGORY_OPENABLE);
+ intent.addCategory(Intent.CATEGORY_OPENABLE
+);
  intent.setType("image/*");
  startActivity(intent);
+
+------------------------------------------
+2018-4-9 16:25:34
+ÕÒ¹¤×÷£º  
+1.ÖÇÁªÕÐÆ¸
+2.ÖÇÁª×¿Æ¸
+3.51cto
+4.ÁÔÆ¸Íø
+5.codekk
+6.BossÖ±Æ¸
+
+----------------------------------------------
+2018-4-9 16:25:47
+javaÖÐequals£¬hashcodeºÍ==µÄÇø±ð
+https://www.cnblogs.com/kexianting/p/8508207.html
+
+java Êý¾ÝÀàÐÍËùÕ¼×Ö½ÚÊý,int char
+    1.byte ÊÇ×Ö½ÚÊý¾ÝÀàÐÍ £¬ÊÇÓÐ·ûºÅÐÍµÄ£¬Õ¼1 ¸ö×Ö½Ú£»´óÐ¡·¶Î§Îª-128¡ª127 ¡£ 
+    2.char ÊÇ×Ö·ûÊý¾ÝÀàÐÍ £¬ÊÇÎÞ·ûºÅÐÍµÄ£¬Õ¼2×Ö½Ú(UnicodeÂë £©£»´óÐ¡·¶Î§ ÊÇ0¡ª65535 £» 
+       charÊÇÒ»¸ö16Î»¶þ½øÖÆµÄUnicode×Ö·û£¬JAVAÓÃcharÀ´±íÊ¾Ò»¸ö×Ö·û ¡£(char ±íÊ¾ÖÐÎÄµ¥×ÖÕ¼Á¬¸ö×Ö½Ú,±íÊ¾Ó¢ÎÄ×Ö·ûÕ¼Ò»¸ö×Ö½Ú) 
+    3.intÊÇÕûÐÍÊý¾ÝÀàÐÍ£¬ÊÇÓÐ·ûºÅÐÍµÄ£¬Õ¼ÓÃ4¸ö×Ö½Ú£¬´óÐ¡·¶Î§Îª£º-2147483648µ½2147483647 
+    4.long / double  8¸ö×Ö½Ú £¬float  4¸ö×Ö½Ú 
+    5.short  Á½×Ö½Ú 
+
+
+intºÍIntegerµÄÇø±ð
+1¡¢IntegerÊÇintµÄ°ü×°Àà£¬intÔòÊÇjavaµÄÒ»ÖÖ»ù±¾Êý¾ÝÀàÐÍ 
+2¡¢Integer±äÁ¿±ØÐëÊµÀý»¯ºó²ÅÄÜÊ¹ÓÃ£¬¶øint±äÁ¿²»ÐèÒª 
+3¡¢IntegerÊµ¼ÊÊÇ¶ÔÏóµÄÒýÓÃ£¬µ±newÒ»¸öIntegerÊ±£¬Êµ¼ÊÉÏÊÇÉú³ÉÒ»¸öÖ¸ÕëÖ¸Ïò´Ë¶ÔÏó£»¶øintÔòÊÇÖ±½Ó´æ´¢Êý¾ÝÖµ 
+4¡¢IntegerµÄÄ¬ÈÏÖµÊÇnull£¬intµÄÄ¬ÈÏÖµÊÇ0
+
+
+Ì¸Ì¸Java¶àÌ¬µÄÀí½â
+¶àÌ¬£ºÍ¬Ò»ÏûÏ¢¿ÉÒÔ¸ù¾Ý·¢ËÍ¶ÔÏóµÄ²»Í¬¶ø²ÉÓÃ¶àÖÖ²»Í¬µÄÐÐÎª·½Ê½¡££¨·¢ËÍÏûÏ¢¾ÍÊÇº¯Êýµ÷ÓÃ£©
+¶àÌ¬µÄÊµÏÖµÄ±ØÒªÌõ¼þ£º¼Ì³Ð£¬ÖØÐ´£¬¸¸ÀàÒýÓÃÖ¸Ïò×ÓÀà¶ÔÏó£¨¼´£¬ÉùÃ÷ÊÇ¸¸Àà£¬Êµ¼ÊÖ¸ÏòµÄÊÇ×ÓÀàµÄÒ»¸ö¶ÔÏó£©
+¶àÌ¬µÄ×÷ÓÃ£ºÏû³ýÀàÐÍÖ®¼äµÄñîºÏ¹ØÏµ¡£
+
+
+String¡¢StringBuffer¡¢StringBuilderÇø±ð
+
+String ×Ö·û´®³£Á¿
+StringBuffer ×Ö·û´®±äÁ¿£¨Ïß³Ì°²È«£©
+StringBuilder ×Ö·û´®±äÁ¿£¨·ÇÏß³Ì°²È«£©
+
+Ê²Ã´ÊÇÄÚ²¿Àà£¿ÄÚ²¿ÀàÓÐÊ²Ã´×÷ÓÃ£¿(java)
+ÄÚ²¿Àà£¨ Inner Class £©¾ÍÊÇ¶¨ÒåÔÚÁíÍâÒ»¸öÀàÀïÃæµÄÀà¡£ÓëÖ®¶ÔÓ¦£¬°üº¬ÄÚ²¿ÀàµÄÀà±»³ÆÎªÍâ²¿Àà¡£
+
+×÷ÓÃ£º1¡¢ÄÚ²¿Àà¿ÉÒÔºÜºÃµÄÊµÏÖÒþ²Ø
+
+2¡¢ÄÚ²¿ÀàÓµÓÐÍâÎ§ÀàµÄËùÓÐÔªËØµÄ·ÃÎÊÈ¨ÏÞ
+
+3¡¢¿ÉÒÔÊµÏÖ¶àÖØ¼Ì³Ð
+
+4¡¢¿ÉÒÔ±ÜÃâ½Ó¿ÚÖÐµÄ·½·¨ºÍÍ¬Ò»¸öÀàÖÐµÄ·½·¨Í¬ÃûµÄÎÊÌâ
+
+
+
+½Ó¿ÚºÍ³éÏóÀàÓÐÊ²Ã´Çø±ð
+½Ó¿ÚÊÇ¶Ô¶¯×÷µÄ³éÏó
+³éÏóÀàÊÇ¶Ô¸ùÔ´µÄ³éÏó
+
+µÚÒ»µã£® ½Ó¿ÚÊÇ³éÏóÀàµÄ±äÌå£¬½Ó¿ÚÖÐËùÓÐµÄ·½·¨¶¼ÊÇ³éÏóµÄ¡£¶ø³éÏóÀàÊÇÉùÃ÷·½·¨µÄ´æÔÚ¶ø²»È¥ÊµÏÖËüµÄÀà¡£
+µÚ¶þµã£® ½Ó¿Ú¿ÉÒÔ¶à¼Ì³Ð£¬³éÏóÀà²»ÐÐ
+µÚÈýµã£® ½Ó¿Ú¶¨Òå·½·¨£¬²»ÄÜÊµÏÖ£¬¶ø³éÏóÀà¿ÉÒÔÊµÏÖ²¿·Ö·½·¨¡£
+µÚËÄµã£® ½Ó¿ÚÖÐ»ù±¾Êý¾ÝÀàÐÍÎªstatic ¶ø³éÀàÏó²»ÊÇµÄ¡£
+
+µ±Äã¹Ø×¢Ò»¸öÊÂÎïµÄ±¾ÖÊµÄÊ±ºò£¬ÓÃ³éÏóÀà£»µ±Äã¹Ø×¢Ò»¸ö²Ù×÷µÄÊ±ºò£¬ÓÃ½Ó¿Ú
+
+------------------------------
+³éÏóÀàµÄÒâÒå
+1¡¢±ØÐë¼¯³ÉµÄÊôÐÔ·½·¨ÓÃ³éÏó·½·¨£¬ ·Ç±ØÐèµÄÓÃ½Ó¿Ú£»
+
+2¡¢½Ó¿ÚÊÇ¹æ·¶ÊÇÐ­µ÷ÓëÆäËüÀàµÄ·½·¨½»»¥µÄÒ»ÖÖÐ­Òé×¼Ôò£»
+
+3¡¢³éÏó·½·¨±ØÐëÊÇPublicµÄ£»
+
+4¡¢ÏëÒªÁË½â³éÏóÀà£¬Ö»Ðè¼Ç×¡³éÏó·½·¨µÄÓ¦ÓÃ³¡¾°¾ÍÐÐÁË£»
+
+5¡¢³éÏó·½·¨ÊÇ¶¨Ò»ÖÖ»òÕßÒ»ÀàÊÂÎï±ØÐëÓÐµÄÒ»ÖÖ¼¼ÄÜ£¬µ«ÊÇÕâÖÖ¼¼ÄÜµÄ±íÏÖÐÎÊ½¶ÔÓÚ¸÷¸ö¼Ì³ÐÕßµÄ±íÏÖÐÎÊ½²»Ò»Ñù£¬¾Í°ÑËü¶¨ÒåÎª³éÏó·½·¨¡£ÒòÎª³éÏó·½·¨±ØÐë´æÔÚ³éÏóÀà£¬ËùÒÔ°ÑÆÕÍ¨¸¸Àà¶¨ÒåÎª³éÏóÀà£»
+
+6¡¢ÎªÊ²Ã´²»¶¨ÒåÎªÆÕÍ¨¸¸ÀàµÄvirtual·½·¨ÄØ£¿
+
+ÒòÎªÆÕÍ¨¸¸ÀàµÄvirtual·½·¨×ÓÀà²»Ò»¶¨·ÇÒªÖØÐ´£¬¶øÄãÓÖÓÐÕâÖÖÇ¿ÖÆÒªÇó£¬±ØÐëÓÐ¶øÇÒ¸²Ð´£¬abstract·½·¨¾ÍÎª´Ë¶øÉú£¡
